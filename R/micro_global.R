@@ -607,16 +607,16 @@ micro_global <- function(
       BulkDensity<-Density
       cap=0
       runmoist<-0
-      PE<-rep(CampNormTbl9_1[1,4],19) #air entry potential J/kg
-      KS<-rep(CampNormTbl9_1[1,6],19) #saturated conductivity, kg s/m3
-      BB<-rep(CampNormTbl9_1[1,5],19) #soil 'b' parameter
+      PE<-rep(NicheMapR::CampNormTbl9_1[1,4],19) #air entry potential J/kg
+      KS<-rep(NicheMapR::CampNormTbl9_1[1,6],19) #saturated conductivity, kg s/m3
+      BB<-rep(NicheMapR::CampNormTbl9_1[1,5],19) #soil 'b' parameter
       BD<-rep(BulkDensity,19) # soil bulk density, Mg/m3
       DD<-rep(Density,19) # soil density, Mg/m3
     }else{
       if(soiltype<12){ # use soil properties as specified in Campbell and Norman 1998 Table 9.1
-        PE<-rep(CampNormTbl9_1[soiltype,4],19) #air entry potential J/kg
-        KS<-rep(CampNormTbl9_1[soiltype,6],19) #saturated conductivity, kg s/m3
-        BB<-rep(CampNormTbl9_1[soiltype,5],19) #soil 'b' parameter
+        PE<-rep(NicheMapR::CampNormTbl9_1[soiltype,4],19) #air entry potential J/kg
+        KS<-rep(NicheMapR::CampNormTbl9_1[soiltype,6],19) #saturated conductivity, kg s/m3
+        BB<-rep(NicheMapR::CampNormTbl9_1[soiltype,5],19) #soil 'b' parameter
         BD<-rep(BulkDensity,19) # soil bulk density, Mg/m3
         DD<-rep(Density,19) # soil density, Mg/m3
       }
