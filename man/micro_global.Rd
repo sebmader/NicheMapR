@@ -11,6 +11,11 @@ DEP = c(0, 2.5,  5,  10,  15,  20,  30,  50,  100,  200), minshade = 0, maxshade
 Usrhyt = 0.01, ...)
 }
 \arguments{
+\item{time}{The time period to be used for climate modelling ("present", "2040_2059",
+"2080_2099")}
+
+\item{rcp}{The emission scenario to be used for climate modelling ("none", "45", "85")}
+
 \item{loc}{Longitude and latitude (decimal degrees)}
 
 \item{timeinterval}{The number of time intervals to generate predictions for over a year (must be 12 <= x <=365)}
