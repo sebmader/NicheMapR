@@ -8,6 +8,9 @@
 #' Koepke, P., M. Hess, I. Schult, and E. P. Shettle. 1997. Global Aerosol Data Set. Max-Planck-Institut for Meteorologie, Hamburg
 #' by choosing the option 'run.gads<-1'
 #' @encoding UTF-8
+#' @param time The time period to be used for climate modelling ("present", "2040_2059",
+#' "2080_2099")
+#' @param rcp The emission scenario to be used for climate modelling ("none", "45", "85")
 #' @param loc Longitude and latitude (decimal degrees)
 #' @param timeinterval The number of time intervals to generate predictions for over a year (must be 12 <= x <=365)
 #' @param nyears The number of years to run
@@ -286,6 +289,8 @@
 #'}
 #' @export
 micro_global <- function(
+  time = "present",
+  rcp = "none",
   loc = c(-89.40123, 43.07305),
   timeinterval = 12,
   nyears = 1,
@@ -697,6 +702,54 @@ micro_global <- function(
     WNMINN<-WNMAXX*0.1 # impose diurnal cycle
     TMINN <- CLIMATE[,38:49]/10
     TMAXX <- CLIMATE[,50:61]/10
+
+    ### TODO: put Rainfall, Tmin and Tmax from future climate here ###
+    if(time != "present") {
+      if(rcp == "none") {
+        stop("If you want to analyse climate predictions, you have to specify the
+             emission scenario. Either rcp = '45' (medium emissions) or
+             '85' (high emissions).")
+      }
+      # which location
+      loc_name <- ""
+      if(isTRUE(all.equal(loc, c(18.48183333, -33.473)))) {
+        loc_name <- "DAR"
+      } else if(isTRUE(all.equal(loc, c(18.367115, -32.33073)))) {
+        loc_name <- "ELB"
+      } else if(isTRUE(all.equal(loc, c(17.87886, -32.98373)))) {
+        loc_name <- "JAB"
+      } else if(isTRUE(all.equal(loc, c(25.6390895, -28.631946)))) {
+        loc_name <- "LHO"
+      } else if(isTRUE(all.equal(loc, c(17.76673, -29.29445)))) {
+        loc_name <- "STE"
+      } else stop("For this location there is no climate prediction data available.")
+
+      cat(paste0("location is ", loc_name, ".\n"))
+
+      # get files with climate projection data for that location, time and scenario
+      library(stringr)
+      future_clim_dir <- paste0(folder, "/future_multimodelavg/")
+      file_list <- list.files(path = future_clim_dir)
+      pattern <- paste0(loc_name, ".*", time, ".*rcp", rcp, ".*")
+      file_names <- file_list[str_detect(string = file_list, pattern = pattern)]
+
+      # extract data from files
+      rain_file <- file_names[str_detect(string = file_names, pattern = ".*_pr_.*")]
+      rain_data <- read.csv(file = paste0(future_clim_dir, rain_file))
+      RAINFALL <- rain_data[,1]
+
+      maxtemp_file <- file_names[str_detect(string = file_names, pattern = ".*_tasmax_.*")]
+      maxtemp_data <- read.csv(file = paste0(future_clim_dir, maxtemp_file))
+      TMAXX <- maxtemp_data[,1]
+      CLIMATE[,50:61] <- TMAXX
+
+
+      mintemp_file <- file_names[str_detect(string = file_names, pattern = ".*_tasmin_.*")]
+      mintemp_data <- read.csv(file = paste0(future_clim_dir, mintemp_file))
+      TMINN <- mintemp_data[,1]
+      CLIMATE[,38:49] <- TMINN
+    }
+
     TMAXX<-TMAXX+adiab_corr_max
     TMINN<-TMINN+adiab_corr_min
     ALLMINTEMPS<-TMINN
