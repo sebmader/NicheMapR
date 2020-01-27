@@ -703,7 +703,7 @@ micro_global <- function(
     TMINN <- CLIMATE[,38:49]/10
     TMAXX <- CLIMATE[,50:61]/10
 
-    ### TODO: put Rainfall, Tmin and Tmax from future climate here ###
+    ### Incorporate Rainfall, Tmin and Tmax from future climate ###
     if(time != "present") {
       if(rcp == "none") {
         stop("If you want to analyse climate predictions, you have to specify the
