@@ -898,8 +898,8 @@ micro_global <- function(
       if(run.gads==1){
         ####### get solar attenuation due to aerosols with program GADS #####################
         relhum<-1.
-        optdep.summer<-as.data.frame(rungads(longlat[2],longlat[1],relhum,0))
-        optdep.winter<-as.data.frame(rungads(longlat[2],longlat[1],relhum,1))
+        optdep.summer<-as.data.frame(NicheMapR::rungads(longlat[2],longlat[1],relhum,0))
+        optdep.winter<-as.data.frame(NicheMapR::rungads(longlat[2],longlat[1],relhum,1))
         optdep<-cbind(optdep.winter[,1],rowMeans(cbind(optdep.summer[,2],optdep.winter[,2])))
         optdep<-as.data.frame(optdep)
         colnames(optdep)<-c("LAMBDA","OPTDEPTH")
