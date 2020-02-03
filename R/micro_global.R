@@ -9,7 +9,7 @@
 #' by choosing the option 'run.gads<-1'
 #' @encoding UTF-8
 #' @param time The time period to be used for climate modelling ("present", "2040_2059",
-#' "2080_2099")
+#' "2080_2099", "presentCCKP" (for current climate taken from CCKP))
 #' @param rcp The emission scenario to be used for climate modelling ("none", "45", "85")
 #' @param loc Longitude and latitude (decimal degrees)
 #' @param timeinterval The number of time intervals to generate predictions for over a year (must be 12 <= x <=365)
@@ -705,11 +705,7 @@ micro_global <- function(
 
     ### Incorporate Rainfall, Tmin and Tmax from future climate ###
     if(time != "present") {
-      if(rcp == "none") {
-        stop("If you want to analyse climate predictions, you have to specify the
-             emission scenario. Either rcp = '45' (medium emissions) or
-             '85' (high emissions).")
-      }
+
       # which location
       loc_name <- ""
       if(isTRUE(all.equal(loc, c(18.48183333, -33.473)))) {
@@ -727,27 +723,44 @@ micro_global <- function(
       cat(paste0("location is ", loc_name, ".\n"))
 
       # get files with climate projection data for that location, time and scenario
-      library(stringr)
-      future_clim_dir <- paste0(folder, "/future_multimodelavg/")
-      file_list <- list.files(path = future_clim_dir)
-      pattern <- paste0(loc_name, ".*", time, ".*rcp", rcp, ".*")
-      file_names <- file_list[str_detect(string = file_list, pattern = pattern)]
+      if(time == "2040_2059" | time == "2080_2099") {
+        if(rcp == "none") {
+          stop("If you want to analyse climate predictions, you have to specify the
+             emission scenario. Either rcp = '45' (medium emissions) or
+             '85' (high emissions).")
+        }
+        # load future climate from folder
+        future_clim_dir <- paste0(folder, "/future_multimodelavg/")
+        file_list <- list.files(path = future_clim_dir)
+        pattern <- paste0(loc_name, ".*", time, ".*rcp", rcp, ".*")
+        file_names <- file_list[stringr::str_detect(string = file_list, pattern = pattern)]
 
-      # extract data from files
-      rain_file <- file_names[str_detect(string = file_names, pattern = ".*_pr_.*")]
-      rain_data <- read.csv(file = paste0(future_clim_dir, rain_file))
-      RAINFALL <- rain_data[,1]
+        # extract data from files
+        rain_file <- file_names[stringr::str_detect(string = file_names, pattern = ".*_pr_.*")]
+        rain_data <- read.csv(file = paste0(future_clim_dir, rain_file))
+        RAINFALL <- rain_data[,1]
 
-      maxtemp_file <- file_names[str_detect(string = file_names, pattern = ".*_tasmax_.*")]
-      maxtemp_data <- read.csv(file = paste0(future_clim_dir, maxtemp_file))
-      TMAXX <- maxtemp_data[,1]
-      CLIMATE[,50:61] <- TMAXX
+        maxtemp_file <- file_names[stringr::str_detect(string = file_names, pattern = ".*_tasmax_.*")]
+        maxtemp_data <- read.csv(file = paste0(future_clim_dir, maxtemp_file))
+        TMAXX <- maxtemp_data[,1]
+        CLIMATE[,50:61] <- TMAXX*10
 
+        mintemp_file <- file_names[stringr::str_detect(string = file_names, pattern = ".*_tasmin_.*")]
+        mintemp_data <- read.csv(file = paste0(future_clim_dir, mintemp_file))
+        TMINN <- mintemp_data[,1]
+        CLIMATE[,38:49] <- TMINN*10
 
-      mintemp_file <- file_names[str_detect(string = file_names, pattern = ".*_tasmin_.*")]
-      mintemp_data <- read.csv(file = paste0(future_clim_dir, mintemp_file))
-      TMINN <- mintemp_data[,1]
-      CLIMATE[,38:49] <- TMINN
+      } else if(time == "presentCCKP") {
+        CCKP_clim_dir <- paste0(folder, "/current_multiyearavg/")
+        file_list <- list.files(path = CCKP_clim_dir)
+        pattern <- paste0(loc_name, ".*", "1961_1990", ".*")
+        file_names <- file_list[stringr::str_detect(string = file_list, pattern = pattern)]
+
+        # extract rainfall from files
+        rain_file <- file_names[stringr::str_detect(string = file_names, pattern = ".*_pr_.*")]
+        rain_data <- read.csv(file = paste0(CCKP_clim_dir, rain_file))
+        RAINFALL <- rain_data[,1]
+      }
     }
 
     TMAXX<-TMAXX+adiab_corr_max
