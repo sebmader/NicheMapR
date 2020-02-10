@@ -27,8 +27,9 @@ rungads <- function(lat, lon, relhum, season) {
     dyn.load(paste(lib.loc = .libPaths()[1],libpath,sep=""))
   }
   curdir<-getwd()
-  setwd(path.package("NicheMapR"))
-  lat5s<-seq(-90,90,5) #lat range for GADS
+  setwd(paste0(.libPaths()[1], "/NicheMapR"))
+  # setwd(path.package("NicheMapR"))
+  lat5s<-seq(-90,90,5) #lat range for GADSs
   lon5s<-seq(-180,175,5) #long range for GADS
   lat5<-lat5s[which.min(abs(lat5s-lat))] # get nearest latitude square for input location
   lon5<-lon5s[which.min(abs(lon5s-lon))] # get nearest longitude square for input location
