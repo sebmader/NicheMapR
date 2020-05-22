@@ -717,7 +717,49 @@ micro_global <- function(
       } else if(isTRUE(all.equal(loc, c(25.6390895, -28.631946)))) {
         loc_name <- "LHO"
       } else if(isTRUE(all.equal(loc, c(17.76673, -29.29445)))) {
-        loc_name <- "STE"
+        loc_name <- "STE" #####
+      } else if(isTRUE(all.equal(loc, c(19.103196, -33.616922)))) {
+        loc_name <- "BAI"
+      } else if(isTRUE(all.equal(loc, c(23.639199, -33.955369)))) {
+        loc_name <- "BLO"
+      } else if(isTRUE(all.equal(loc, c(18.83097, -34.38334)))) {
+        loc_name <- "CHA"
+      } else if(isTRUE(all.equal(loc, c(29.52938889, -24.22013889)))) {
+        loc_name <- "CHI"
+      # } else if(isTRUE(all.equal(loc, c(18.367115, -32.33073)))) {
+      #   loc_name <- "DAB"
+      } else if(isTRUE(all.equal(loc, c(18.51303, -31.99062)))) {
+        loc_name <- "GRA"
+      } else if(isTRUE(all.equal(loc, c(18.372249, -33.331626)))) {
+        loc_name <- "KLI"
+      } else if(isTRUE(all.equal(loc, c(17.76673, -29.29445)))) {
+        loc_name <- "LAB"
+      } else if(isTRUE(all.equal(loc, c(29.47108333, -25.53077778)))) {
+        loc_name <- "LAK"
+      } else if(isTRUE(all.equal(loc, c(27.6569725, -23.8605425)))) {
+        loc_name <- "LEP"
+      } else if(isTRUE(all.equal(loc, c(23.63345833, -33.85083333)))) {
+        loc_name <- "LOU"
+      } else if(isTRUE(all.equal(loc, c(30.61777778, -25.14725)))) {
+        loc_name <- "LPA"
+      } else if(isTRUE(all.equal(loc, c(30.619231, -24.498702)))) {
+        loc_name <- "MOK"
+      # } else if(isTRUE(all.equal(loc, c(17.76673, -29.29445)))) {
+      #   loc_name <- "MOL"
+      } else if(isTRUE(all.equal(loc, c(22.415, -33.916)))) {
+        loc_name <- "MPA"
+      } else if(isTRUE(all.equal(loc, c(24.564, -31.69290278)))) {
+        loc_name <- "NBE"
+      } else if(isTRUE(all.equal(loc, c(25.63166667, -34.04547222)))) {
+        loc_name <- "PEL"
+      } else if(isTRUE(all.equal(loc, c(28.06308333, -25.68333334)))) {
+        loc_name <- "PRE"
+      } else if(isTRUE(all.equal(loc, c(19.24687, -28.82521)))) {
+        loc_name <- "RIF"
+      } else if(isTRUE(all.equal(loc, c(27.99380556, -24.17363889)))) {
+        loc_name <- "VAAL"
+      } else if(isTRUE(all.equal(loc, c(28.19972222, -27.67694444)))) {
+        loc_name <- "WIN"
       } else stop("For this location there is no climate prediction data available.")
 
       cat(paste0("location is ", loc_name, ".\n"))
