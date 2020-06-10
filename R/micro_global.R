@@ -732,7 +732,7 @@ micro_global <- function(
         loc_name <- "GRA"
       } else if(isTRUE(all.equal(loc, c(18.372249, -33.331626)))) {
         loc_name <- "KLI"
-      } else if(isTRUE(all.equal(loc, c(17.76673, -29.29445)))) {
+      } else if(isTRUE(all.equal(loc, c(18.304175, -32.11122)))) {
         loc_name <- "LAB"
       } else if(isTRUE(all.equal(loc, c(29.47108333, -25.53077778)))) {
         loc_name <- "LAK"
