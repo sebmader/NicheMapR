@@ -732,7 +732,7 @@ micro_global <- function(
         loc_name <- "GRA"
       } else if(isTRUE(all.equal(loc, c(18.372249, -33.331626)))) {
         loc_name <- "KLI"
-      } else if(isTRUE(all.equal(loc, c(18.304175, -32.11122)))) {
+      } else if(isTRUE(all.equal(loc, c(17.981998, -31.392708)))) {
         loc_name <- "LAB"
       } else if(isTRUE(all.equal(loc, c(29.47108333, -25.53077778)))) {
         loc_name <- "LAK"
@@ -750,7 +750,7 @@ micro_global <- function(
         loc_name <- "MPA"
       } else if(isTRUE(all.equal(loc, c(24.564, -31.69290278)))) {
         loc_name <- "NBE"
-      } else if(isTRUE(all.equal(loc, c(25.63166667, -34.04547222)))) {
+      } else if(isTRUE(all.equal(loc, c(24.40478, -34.112457)))) {
         loc_name <- "PEL"
       } else if(isTRUE(all.equal(loc, c(28.06308333, -25.68333334)))) {
         loc_name <- "PRE"
