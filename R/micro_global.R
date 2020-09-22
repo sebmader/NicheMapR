@@ -703,7 +703,7 @@ micro_global <- function(
     TMINN <- CLIMATE[,38:49]/10
     TMAXX <- CLIMATE[,50:61]/10
 
-    ### Incorporate Rainfall, Tmin and Tmax from future climate ###
+    ### Incorporate Rainfall, Tmin and Tmax from future climate / other climate data bases ###
     if(time != "present") {
 
       # which location
@@ -781,6 +781,7 @@ micro_global <- function(
         rain_file <- file_names[stringr::str_detect(string = file_names, pattern = ".*_pr_.*")]
         rain_data <- read.csv(file = paste0(future_clim_dir, rain_file))
         RAINFALL <- rain_data[,1]
+        CLIMATE[,2:13] <- RAINFALL
 
         # extract temperature data from files
         maxtemp_file <- file_names[stringr::str_detect(string = file_names, pattern = ".*_tasmax_.*")]
@@ -803,8 +804,11 @@ micro_global <- function(
         rain_file <- file_names[stringr::str_detect(string = file_names, pattern = ".*_pr_.*")]
         rain_data <- read.csv(file = paste0(CCKP_clim_dir, rain_file))
         RAINFALL <- rain_data[,1]
+        CLIMATE[,2:13] <- RAINFALL
 
-        ### TODO: why is there no present temperature data ?!
+        # why is there no present temperature data ?
+          # because CCKP only provides the average temperature which doesn't help
+
       } else if(time == "presentNASA") {
         # add the new climate data here (https://power.larc.nasa.gov/data-access-viewer/)
         NASA_dir <- paste0(folder, "/NASA_climate/")
@@ -815,8 +819,10 @@ micro_global <- function(
 
         # extract rainfall
         rain_data <- data[which(data$PARAMETER == "PRECTOT"),]
-        RAINFALL <- as.numeric(rain_data[which(colnames(rain_data) ==
+          # data is per day -> multiply by 30
+        RAINFALL <- 30 * as.numeric(rain_data[which(colnames(rain_data) ==
                                                 "JAN"):which(colnames(rain_data) == "DEC")])
+        CLIMATE[,2:13] <- RAINFALL
 
         # extract temperature
         maxtemp_data <- data[which(data$PARAMETER == "T2M_MAX"),]
@@ -828,6 +834,23 @@ micro_global <- function(
         TMINN <- as.numeric(mintemp_data[which(colnames(mintemp_data) ==
                                                 "JAN"):which(colnames(mintemp_data) == "DEC")])
         CLIMATE[,38:49] <- TMINN*10
+
+        # # extract max./min. wind speed
+        # maxwind_data <- data[which(data$PARAMETER == "WS10M_MAX"),]
+        # WNMAXX <- as.numeric(maxwind_data[which(colnames(maxwind_data) ==
+        #                                           "JAN"):which(colnames(maxwind_data) == "DEC")])
+        #
+        # minwind_data <- data[which(data$PARAMETER == "WS10M_MIN"),]
+        # WNMINN <- as.numeric(minwind_data[which(colnames(minwind_data) ==
+        #                                           "JAN"):which(colnames(minwind_data) == "DEC")])
+
+        # extract (mean) wind speed
+        wind_data <- data[which(data$PARAMETER == "WS10M"),]
+        WNMAXX <- as.numeric(wind_data[which(colnames(wind_data) ==
+                                                  "JAN"):which(colnames(wind_data) == "DEC")])
+
+        CLIMATE[,26:37] <- WNMAXX*10
+        WNMINN<-WNMAXX*0.1 # impose diurnal cycle
       }
 
     }
