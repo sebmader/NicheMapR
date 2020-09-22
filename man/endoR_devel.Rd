@@ -214,7 +214,7 @@ library(NicheMapR)
 # environment
 TAs <- seq(0, 50, 2) # air temperatures (Â°C)
 VEL <- 0.002 # wind speed (m/s)
-RH <- 10 # relative humidity (\\\%)
+RH <- 10 # relative humidity (\\%)
 QSOLR <- 100 # solar radiation (W/m2)
 
 # core temperature
@@ -240,13 +240,13 @@ REFLD = 0.248  # fur reflectivity dorsal (fractional, 0-1)
 REFLV = 0.351  # fur reflectivity ventral (fractional, 0-1)
 
 # physiological responses
-SKINW <- 0.1 # base skin wetness (\\\%)
-MXWET <- 20 # maximum skin wetness (\\\%)
-SWEAT <- 0.25 # intervals by which skin wetness is increased (\\\%)
+SKINW <- 0.1 # base skin wetness (\\%)
+MXWET <- 20 # maximum skin wetness (\\%)
+SWEAT <- 0.25 # intervals by which skin wetness is increased (\\%)
 Q10 <- 2 # Q10 effect of body temperature on metabolic rate
 QBASAL <- 10 ^ (-1.461 + 0.669 * log10(AMASS * 1000)) # basal heat generation (W) (bird formula from McKechnie and Wolf 2004 Phys. & Biochem. Zool. 77:502-521)
 DELTAR <- 5 # offset between air temeprature and breath (Â°C)
-EXTREF <- 15 # O2 extraction efficiency (\\\%)
+EXTREF <- 15 # O2 extraction efficiency (\\%)
 PANTING <- 0.1 # turns on panting, the value being the increment by which the panting multiplier is increased up to the maximum value, PANTMAX
 PANTMAX <- 3# maximum panting rate - multiplier on air flow through the lungs above that determined by metabolic rate
 

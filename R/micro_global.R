@@ -9,7 +9,7 @@
 #' by choosing the option 'run.gads<-1'
 #' @encoding UTF-8
 #' @param time The time period to be used for climate modelling ("present", "2040_2059",
-#' "2080_2099", "presentCCKP" (for current climate taken from CCKP))
+#' "2080_2099", "presentCCKP" (for current climate taken from CCKP), "presentNASA" (for current climate taken from NASA))
 #' @param rcp The emission scenario to be used for climate modelling ("none", "45", "85")
 #' @param loc Longitude and latitude (decimal degrees)
 #' @param timeinterval The number of time intervals to generate predictions for over a year (must be 12 <= x <=365)
@@ -782,6 +782,7 @@ micro_global <- function(
         rain_data <- read.csv(file = paste0(future_clim_dir, rain_file))
         RAINFALL <- rain_data[,1]
 
+        # extract temperature data from files
         maxtemp_file <- file_names[stringr::str_detect(string = file_names, pattern = ".*_tasmax_.*")]
         maxtemp_data <- read.csv(file = paste0(future_clim_dir, maxtemp_file))
         TMAXX <- maxtemp_data[,1]
@@ -802,7 +803,33 @@ micro_global <- function(
         rain_file <- file_names[stringr::str_detect(string = file_names, pattern = ".*_pr_.*")]
         rain_data <- read.csv(file = paste0(CCKP_clim_dir, rain_file))
         RAINFALL <- rain_data[,1]
+
+        ### TODO: why is there no present temperature data ?!
+      } else if(time == "presentNASA") {
+        # add the new climate data here (https://power.larc.nasa.gov/data-access-viewer/)
+        NASA_dir <- paste0(folder, "/NASA_climate/")
+        file_list <- list.files(path = NASA_dir)
+        pattern <- paste0("POWER_.*_", loc_name, "_pres.*")
+        file_name <- file_list[stringr::str_detect(string = file_list, pattern = pattern)]
+        data <- read.csv(file = paste0(NASA_dir, file_name))
+
+        # extract rainfall
+        rain_data <- data[which(data$PARAMETER == "PRECTOT"),]
+        RAINFALL <- as.numeric(rain_data[which(colnames(rain_data) ==
+                                                "JAN"):which(colnames(rain_data) == "DEC")])
+
+        # extract temperature
+        maxtemp_data <- data[which(data$PARAMETER == "T2M_MAX"),]
+        TMAXX <- as.numeric(maxtemp_data[which(colnames(maxtemp_data) ==
+                                                "JAN"):which(colnames(maxtemp_data) == "DEC")])
+        CLIMATE[,50:61] <- TMAXX*10
+
+        mintemp_data <- data[which(data$PARAMETER == "T2M_MIN"),]
+        TMINN <- as.numeric(mintemp_data[which(colnames(mintemp_data) ==
+                                                "JAN"):which(colnames(mintemp_data) == "DEC")])
+        CLIMATE[,38:49] <- TMINN*10
       }
+
     }
 
     TMAXX<-TMAXX+adiab_corr_max

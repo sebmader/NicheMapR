@@ -12,7 +12,7 @@ Usrhyt = 0.01, ...)
 }
 \arguments{
 \item{time}{The time period to be used for climate modelling ("present", "2040_2059",
-"2080_2099")}
+"2080_2099", "presentCCKP" (for current climate taken from CCKP), "presentNASA" (for current climate taken from NASA))}
 
 \item{rcp}{The emission scenario to be used for climate modelling ("none", "45", "85")}
 

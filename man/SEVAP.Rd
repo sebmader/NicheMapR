@@ -4,8 +4,26 @@
 \alias{SEVAP}
 \title{SEVAP}
 \usage{
-SEVAP(BP, TA, RELHUM, VEL, TC, TSURF, ALT, SKINW, FLYHR, CONVSK, HD,
-  HDFREE, PCTBAREVAP, PCTEYES, ZFUR, FURWET, TFA, CONVAR)
+SEVAP(
+  BP,
+  TA,
+  RELHUM,
+  VEL,
+  TC,
+  TSURF,
+  ALT,
+  SKINW,
+  FLYHR,
+  CONVSK,
+  HD,
+  HDFREE,
+  PCTBAREVAP,
+  PCTEYES,
+  ZFUR,
+  FURWET,
+  TFA,
+  CONVAR
+)
 }
 \arguments{
 \item{BP}{A}
