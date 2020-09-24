@@ -760,7 +760,7 @@ micro_global <- function(
         loc_name <- "VAAL"
       } else if(isTRUE(all.equal(loc, c(28.19972222, -27.67694444)))) {
         loc_name <- "WIN"
-      } else stop("For this location there is no climate prediction data available.")
+      } else stop("For this location there is no climate data available.")
 
       cat(paste0("location is ", loc_name, ".\n"))
 
@@ -773,9 +773,24 @@ micro_global <- function(
         }
         # load future climate from folder
         future_clim_dir <- paste0(folder, "/future_multimodelavg/")
+        if(!dir.exists(future_clim_dir)) {
+          stop(paste("There is no folder", future_clim_dir, "to contain future climate data
+          from CCKP. Check your folder structure."))
+        }
+
         file_list <- list.files(path = future_clim_dir)
+        if(length(file_list) < 1) {
+          stop(paste0("There are no files in the folder ",
+                     future_clim_dir, "."))
+        }
+
         pattern <- paste0(loc_name, ".*", time, ".*rcp", rcp, ".*")
         file_names <- file_list[stringr::str_detect(string = file_list, pattern = pattern)]
+        if(length(file_names) < 1) {
+          stop(paste0("There are no climate files for the future scenario ",
+                      time, " RCP", rcp, "at the location ", loc_name, " in the folder ",
+                      future_clim_dir, "."))
+        }
 
         # extract data from files
         rain_file <- file_names[stringr::str_detect(string = file_names, pattern = ".*_pr_.*")]
@@ -796,9 +811,24 @@ micro_global <- function(
 
       } else if(time == "presentCCKP") {
         CCKP_clim_dir <- paste0(folder, "/current_multiyearavg/")
+        if(!dir.exists(CCKP_clim_dir)) {
+          stop(paste("There is no folder", CCKP_clim_dir, "to contain 1961-1990 climate data
+          from CCKP. Check your folder structure."))
+        }
+
         file_list <- list.files(path = CCKP_clim_dir)
+        if(length(file_list) < 1) {
+          stop(paste0("There are no files in the folder ",
+                      CCKP_clim_dir, "."))
+        }
+
         pattern <- paste0(loc_name, ".*", "1961_1990", ".*")
         file_names <- file_list[stringr::str_detect(string = file_list, pattern = pattern)]
+        if(length(file_names) < 1) {
+          stop(paste0("There are no climate files for the 1961_1990 period from CCKP
+                      at the location ", loc_name, " in the folder ",
+                      CCKP_clim_dir, "."))
+        }
 
         # extract rainfall from files
         rain_file <- file_names[stringr::str_detect(string = file_names, pattern = ".*_pr_.*")]
@@ -812,13 +842,33 @@ micro_global <- function(
       } else if(time == "presentNASA") {
         # add the new climate data here (https://power.larc.nasa.gov/data-access-viewer/)
         NASA_dir <- paste0(folder, "/NASA_climate/")
+        if(!dir.exists(NASA_dir)) {
+          stop(paste("There is no folder", NASA_dir, "to contain climate data
+          from NASA. Check your folder structure."))
+        }
+
         file_list <- list.files(path = NASA_dir)
+        if(length(file_list) < 1) {
+          stop(paste0("There are no files in the folder ",
+                      NASA_dir, "."))
+        }
+
         pattern <- paste0("POWER_.*_", loc_name, "_pres.*")
         file_name <- file_list[stringr::str_detect(string = file_list, pattern = pattern)]
+        if(is.na(file_name)) {
+          stop(paste0("There is no file with climate data from NASA
+                      for the location ", loc_name, " in the folder ",
+                      NASA_dir, "."))
+        }
+
         data <- read.csv(file = paste0(NASA_dir, file_name))
 
         # extract rainfall
         rain_data <- data[which(data$PARAMETER == "PRECTOT"),]
+        if(!is.numeric(rain_data[1,1])) {
+          stop(paste0("The parameter 'PRECTOT' (total precipitation) doesn't exist in the NASA climate
+               data file ", file_name, "."))
+        }
           # data is per day -> multiply by 30
         RAINFALL <- 30 * as.numeric(rain_data[which(colnames(rain_data) ==
                                                 "JAN"):which(colnames(rain_data) == "DEC")])
@@ -826,11 +876,21 @@ micro_global <- function(
 
         # extract temperature
         maxtemp_data <- data[which(data$PARAMETER == "T2M_MAX"),]
+        if(!is.numeric(maxtemp_data[1,1])) {
+          stop(paste0("The parameter 'T2M_MAX' (max. temperature at 2m) doesn't exist in
+                      the NASA climate data file ", file_name, "."))
+        }
+
         TMAXX <- as.numeric(maxtemp_data[which(colnames(maxtemp_data) ==
                                                 "JAN"):which(colnames(maxtemp_data) == "DEC")])
         CLIMATE[,50:61] <- TMAXX*10
 
         mintemp_data <- data[which(data$PARAMETER == "T2M_MIN"),]
+        if(!is.numeric(mintemp_data[1,1])) {
+          stop(paste0("The parameter 'T2M_MIN' (min. temperature at 2m) doesn't exist in
+                      the NASA climate data file ", file_name, "."))
+        }
+
         TMINN <- as.numeric(mintemp_data[which(colnames(mintemp_data) ==
                                                 "JAN"):which(colnames(mintemp_data) == "DEC")])
         CLIMATE[,38:49] <- TMINN*10
@@ -846,6 +906,11 @@ micro_global <- function(
 
         # extract (mean) wind speed
         wind_data <- data[which(data$PARAMETER == "WS10M"),]
+        if(!is.numeric(wind_data[1,1])) {
+          stop(paste0("The parameter 'WS10M' (wind speed at 10m) doesn't exist in
+                      the NASA climate data file ", file_name, "."))
+        }
+
         WNMAXX <- as.numeric(wind_data[which(colnames(wind_data) ==
                                                   "JAN"):which(colnames(wind_data) == "DEC")])
 
