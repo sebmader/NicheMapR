@@ -8,18 +8,18 @@
 #' @param Ww_g = 500, animal weight (g)
 #' @param rho_body = 932, animal density (kg/m3)
 #' @param q = 0, metabolic heat production rate W/m3
-#' @param c_body = 3073, Specific heat of flesh J/(kg-K)
-#' @param k_flesh = 0.5, Thermal conductivity of flesh (W/mK, range: 0.412-2.8)
-#' @param emis = 0.95, Emissivity of animal (0-1)
-#' @param abs = 0.85, solar absorptivity, decimal percent
-#' @param geom = 2, Organism shape, 0-5, Determines whether standard or custom shapes/surface area/volume relationships are used: 0=plate, 1=cyl, 2=ellips, 3=lizard (desert iguana), 4=frog (leopard frog), 5=custom (see parameter 'shape_coefs')
-#' @param shape_b = 1/5, Proportionality factor (-) for going from volume to area, represents ratio of width:height for a plate, length:diameter for cylinder, b axis:a axis for ellipsoid
-#' @param shape_c = 1/5, Proportionality factor (-) for going from volume to area, represents ratio of length:height for a plate, c axis:a axis for ellipsoid
-#' @param shape_coefs = c(10.4713,.688,0.425,0.85,3.798,.683,0.694,.743), Custom shape coefficients. Operates if geom=5, and consists of 4 pairs of values representing the parameters a and b of a relationship AREA=a*Ww_g^b, where AREA is in cm2 and Ww_g is in g. The first pair are a and b for total surface area, then a and b for ventral area, then for sillhouette area normal to the sun, then sillhouette area perpendicular to the sun
+#' @param c_body = 3073, specific heat of flesh J/(kg-K)
+#' @param k_flesh = 0.5, thermal conductivity of flesh (W/mK, range: 0.412-2.8)
+#' @param emis = 0.95, emissivity of animal (0-1)
+#' @param alpha = 0.85, solar absorptivity, decimal percent
+#' @param geom = 2, organism shape, 0-5, Determines whether standard or custom shapes/surface area/volume relationships are used: 0=plate, 1=cyl, 2=ellips, 3=lizard (desert iguana), 4=frog (leopard frog), 5=custom (see parameter 'shape_coefs')
+#' @param shape_b = 1/5, proportionality factor (-) for going from volume to area, represents ratio of width:height for a plate, length:diameter for cylinder, b axis:a axis for ellipsoid
+#' @param shape_c = 1/5, proportionality factor (-) for going from volume to area, represents ratio of length:height for a plate, c axis:a axis for ellipsoid
+#' @param shape_coefs = c(10.4713,.688,0.425,0.85,3.798,.683,0.694,.743), custom shape coefficients. Operates if geom=5, and consists of 4 pairs of values representing the parameters a and b of a relationship AREA=a*Ww_g^b, where AREA is in cm2 and Ww_g is in g. The first pair are a and b for total surface area, then a and b for ventral area, then for silhouette area normal to the sun, then silhouette area perpendicular to the sun
 #' @param posture = 'n' pointing normal 'n', parallel 'p' to the sun's rays, or 'a' in between?
 #' @param orient = 1, does the object orient toward the sun? (0,1)
-#' @param fatosk = 0.4, Configuration factor to sky (-) for infrared calculations
-#' @param fatosb = 0.4, Configuration factor to subsrate for infrared calculations
+#' @param fatosk = 0.4, configuration factor to sky (-) for infrared calculations
+#' @param fatosb = 0.4, configuration factor to substrate for infrared calculations
 #' @param alpha_sub = 0.2, substrate solar reflectivity, decimal percent
 #' @param pdif = 0.1, proportion of solar energy that is diffuse (rather than direct beam)
 #' @param Tair = 30, air temperature (°C)
@@ -29,7 +29,7 @@
 #' @param Zen = 20, zenith angle of sun (90 is below horizon), degrees
 #' @param press = 101325, air pressure (Pa)
 #' @return Tc Core temperature (°C)
-#' @return Tcf Final (steady state) temperature (°C), if conditions remained constant indefinately
+#' @return Tcf Final (steady state) temperature (°C), if conditions remained constant indefinitely
 #' @return tau Time constant (s)
 #' @return dTc Rate of change of core temperature (°C/s)
 #' @usage onelump(t, Tc_init, Ww_g, geom, Tair, Trad, vel, Qsol, Zen, ...)
@@ -158,11 +158,11 @@ onelump<-function(t = seq(1, 3600, 60), Tc_init = 5, Ww_g = 500,
     B1 <- A1 * shape_b # axis B, m
     C1 <- A1 * shape_c # axis C, m
     P1 <- 1.6075 # a constant
-    ATOT <- (4 * pi * (((A1 ^ P1 * B1 ^ P1 + A1 ^ P1 * C1 ^ P1 + B1 ^ P1 * C1 ^ P1)        ) / 3) ^ (1 / P1)) # total surface area, m2
+    ATOT <- (4 * pi * (((A1 ^ P1 * B1 ^ P1 + A1 ^ P1 * C1 ^ P1 + B1 ^ P1 * C1 ^ P1)) / 3) ^ (1 / P1)) # total surface area, m2
     ASILN <- max(pi * A1 * C1, pi * B1 * C1) # max silhouette area, m2
     ASILP <- min(pi * A1 * C1, pi * B1 * C1) # min silhouette area, m2
     S2 <- (A1 ^ 2 * B1 ^ 2 * C1 ^ 2) / (A1 ^ 2 * B1 ^ 2 + A1 ^ 2 * C1 ^ 2 + B1 ^ 2 * C1 ^ 2) # fraction of semi-major and minor axes, see Porter and Kearney 2009 supp1
-    k_flesh <- 0.5# + 6.14 * B1 + 0.439 # thermal conductivity of flesh as a function of radius, see Porter and Kearney 2009
+    #k_flesh <- 0.5 + 6.14 * B1 + 0.439 # thermal conductivity of flesh as a function of radius, see Porter and Kearney 2009
   }
 
   # Lizard geometry - DESERT IGUANA (PORTER ET AL. 1973 OECOLOGIA)
@@ -204,7 +204,7 @@ onelump<-function(t = seq(1, 3600, 60), Tc_init = 5, Ww_g = 500,
 
   if (max(Zen) >= 89) {
     Q_norm <- 0
-  } else{
+  }else{
     if(orient == 1){
       Q_norm <- (Qsol / cos(Zenith))
     }else{

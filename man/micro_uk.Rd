@@ -28,9 +28,9 @@ Usrhyt = 0.01, ...)
 
 \item{DEP}{Soil depths at which calculations are to be made (cm), must be 10 values starting from 0, and more closely spaced near the surface}
 
-\item{minshade}{Minimum shade level to use (\%)}
+\item{minshade}{Minimum shade level to use (\%) (can be a single value or a vector of daily values)}
 
-\item{maxshade}{Maximum shade level to us (\%)}
+\item{maxshade}{Maximum shade level to us (\%) (can be a single value or a vector of daily values)}
 
 \item{Usrhyt}{Local height (m) at which air temperature, wind speed and humidity are to be computed for organism of interest}
 
@@ -74,7 +74,7 @@ An implementation of the NicheMapR microclimate model that uses the CHESS daily 
 
 \code{runshade}{ = 1, Run the microclimate model twice, once for each shade level (1) or just once for the minimum shade (0)?}\cr\cr
 \code{clearsky}{ = 0, Run for clear skies (1) or with observed cloud cover (0)}\cr\cr
-\code{run.gads}{ = 1, Use the Global Aerosol Database? 1=yes, 0=no}\cr\cr
+\code{run.gads}{ = 1, Use the Global Aerosol Database? 1=yes (Fortran version), 2=yes (R version), 0=no}\cr\cr
 \code{IR}{ = 0, Clear-sky longwave radiation computed using Campbell and Norman (1998) eq. 10.10 (includes humidity) (0) or Swinbank formula (1)}\cr\cr
 \code{solonly}{ = 0, Only run SOLRAD to get solar radiation? 1=yes, 0=no}\cr\cr
 \code{lamb}{ = 0, Return wavelength-specific solar radiation output?}\cr\cr
@@ -98,7 +98,7 @@ An implementation of the NicheMapR microclimate model that uses the CHESS daily 
 \code{ERR}{ = 1.5, Integrator error tolerance for soil temperature calculations}\cr\cr
 \code{Refhyt}{ = 1.2, Reference height (m), reference height at which air temperature, wind speed and relative humidity input data are measured}\cr\cr
 \code{RUF}{ = 0.004, Roughness height (m), e.g. smooth desert is 0.0003, closely mowed grass may be 0.001, bare tilled soil 0.002-0.006, current allowed range: 0.00001 (snow) - 0.02 m.}\cr\cr
-\code{ZH}{ = 0, heat transfer roughness height (m) for Campbell and Norman air temperature/wind speed profile (invoked if greater than 1, 0.02 * canopy height in m if unknown)}\cr\cr
+\code{ZH}{ = 0, heat transfer roughness height (m) for Campbell and Norman air temperature/wind speed profile (invoked if greater than 0, 0.02 * canopy height in m if unknown)}\cr\cr
 \code{D0}{ = 0, zero plane displacement correction factor (m) for Campbell and Norman air temperature/wind speed profile (0.6 * canopy height in m if unknown)}\cr\cr
 \code{Z01}{ = 0, Top (1st) segment roughness height(m) - IF NO EXPERIMENTAL WIND PROFILE DATA SET THIS TO ZERO! (then RUF and Refhyt used)}\cr\cr
 \code{Z02}{ = 0, 2nd segment roughness height(m) - IF NO EXPERIMENTAL WIND PROFILE DATA SET THIS TO ZERO! (then RUF and Refhyt used).}\cr\cr
@@ -110,7 +110,7 @@ An implementation of the NicheMapR microclimate model that uses the CHESS daily 
 \code{Density}{ = 2.56, Soil minerals density (Mg/m3)}\cr\cr
 \code{SpecHeat}{ = 870, Soil minerals specific heat (J/kg-K)}\cr\cr
 \code{BulkDensity}{ = 1.3, Soil bulk density (Mg/m3)}\cr\cr
-\code{PCTWET}{ = 0, \% of ground surface area acting as a free water surface}\cr\cr
+\code{PCTWET}{ = 0, \% of ground surface area acting as a free water surface (overridden if soil moisture model is running)}\cr\cr
 \code{rainwet}{ = 1.5, mm of rainfall causing the ground to be 90\% wet for the day}\cr\cr
 \code{cap}{ = 1, organic cap present on soil surface? (cap has lower conductivity - 0.2 W/mC - and higher specific heat 1920 J/kg-K)}\cr\cr
 \code{CMH2O}{ = 1, Precipitable cm H2O in air column, 0.1 = very dry; 1.0 = moist air conditions; 2.0 = humid, tropical conditions (note this is for the whole atmospheric profile, not just near the ground)}\cr\cr
@@ -152,7 +152,7 @@ An implementation of the NicheMapR microclimate model that uses the CHESS daily 
 \code{SP}{ = 10, stability parameter for stomatal closure equation, -}\cr\cr
 \code{IM}{ = 1e-06, maximum allowable mass balance error, kg}\cr\cr
 { and points half way between)}\cr\cr
-\code{LAI}{ = 0.1, leaf area index, used to partition traspiration/evaporation from PET}\cr\cr
+\code{LAI}{ = 0.1, leaf area index (can be a single value or a vector of daily values), used to partition traspiration/evaporation from PET}\cr\cr
 
 \strong{ Snow mode parameters:}
 
@@ -164,7 +164,7 @@ An implementation of the NicheMapR microclimate model that uses the CHESS daily 
 \code{undercatch}{ = 1, undercatch multipier for converting rainfall to snow}\cr\cr
 \code{rainmelt}{ = 0.0125, paramter in equation that melts snow with rainfall as a function of air temp}\cr\cr
 \code{snowcond}{ = 0, effective snow thermal conductivity W/mC (if zero, uses inbuilt function of density)}\cr\cr
-\code{intercept}{ = maxshade / 100 * 0.3, snow interception fraction for when there's shade (0-1)}\cr\cr
+\code{intercept}{ = max(maxshade) / 100 * 0.3, snow interception fraction for when there's shade (0-1)}\cr\cr
 \code{grasshade}{ = 0, if 1, means shade is removed when snow is present, because shade is cast by grass/low shrubs}\cr\cr
 
 \strong{ Intertidal mode parameters:}
@@ -172,7 +172,7 @@ An implementation of the NicheMapR microclimate model that uses the CHESS daily 
 \code{shore}{ Include tide effects? If 1, the matrix}
 \code{tides}
 { is used to specify tide presence, sea water temperature and presence of wavesplash}\cr\cr
-\code{tides}{ = matrix(data = 0., nrow = 24*timeinterval*nyears, ncol = 3), matrix for each how of the simulation of 1. tide state (0=out, 1=in), 2. Water temperature (°C) and 3. Wave splash (0=yes, 1=no)}\cr\cr
+\code{tides}{ = matrix(data = 0., nrow = 24*timeinterval*nyears, ncol = 3), matrix of 1. tide state (0=out, 1=in), 2. Water temperature (°C) and 3. Wave splash (0=yes, 1=no)}\cr\cr
 }
 
 \strong{Outputs:}
@@ -185,8 +185,7 @@ An implementation of the NicheMapR microclimate model that uses the CHESS daily 
 \code{RAINFALL}{ - vector of daily rainfall (mm)}\cr\cr
 \code{elev}{ - elevation at point of simulation (m)}\cr\cr
 \code{minshade}{ - minimum shade for simulation (\%)}\cr\cr
-\code{maxshade}{ - maximum shade for simulation (single value - if time varying, in 'MAXSHADES') (\%)}\cr\cr
-\code{MAXSHADES}{ - vector of maximum shades used (\%)}\cr\cr
+\code{maxshade}{ - maximum shade for simulation (\%)}\cr\cr
 \code{DEP}{ - vector of depths used (cm)}\cr\cr
 
 metout/shadmet variables:
@@ -203,7 +202,7 @@ metout/shadmet variables:
 \item 10 POOLDEP - water pooling on surface (mm)
 \item 11 PCTWET - soil surface wetness (\%)
 \item 12 ZEN - zenith angle of sun (degrees - 90 = below the horizon)
-\item 13 SOLR - solar radiation (W/m2)
+\item 13 SOLR - solar radiation (W/m2) (unshaded, horizontal plane)
 \item 14 TSKYC - sky radiant temperature (°C)
 \item 15 DEW - dew presence (0 or 1)
 \item 16 FROST - frost presence (0 or 1)
@@ -224,13 +223,13 @@ soilmoist and shadmoist variables:
 \itemize{
 \item 1 DOY - day-of-year
 \item 2 TIME - time of day (mins)
-\item 3-12 WC0cm ... - soil moisuture (m3/m3) at each of the 10 specified depths
+\item 3-12 WC0cm ... - soil moisture (m3/m3) at each of the 10 specified depths
 }
 soilpot and shadpot variables:
 \itemize{
 \item 1 DOY - day-of-year
 \item 2 TIME - time of day (mins)
-\item 3-12 PT0cm ... - soil water potential (J/kg = kpa = bar/100) at each of the 10 specified depths
+\item 3-12 PT0cm ... - soil water potential (J/kg = kPa = bar/100) at each of the 10 specified depths
 }
 humid and shadhumid variables:
 \itemize{
@@ -242,9 +241,9 @@ plant and shadplant variables:
 \itemize{
 \item  1 DOY - day-of-year
 \item  2 TIME - time of day (mins)
-\item  3 TRANS - plant transpiration rate (kg/m2/s)
-\item  4 LEAFPOT - leaf water potential (J/kg)
-\item  5-14 RPOT0cm ... - root water potential (J/kg), at each of the 10 specified depths
+\item  3 TRANS - plant transpiration rate (g/m2/h)
+\item  4 LEAFPOT - leaf water potential (J/kg = kPa = bar/100)
+\item  5-14 RPOT0cm ... - root water potential (J/kg = kPa = bar/100), at each of the 10 specified depths
 }
 
 if snow model is run i.e. parameter lamb = 1\cr

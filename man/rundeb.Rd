@@ -25,7 +25,8 @@ rundeb(
   E.0.mult = 1,
   plot = 1,
   mass.unit = "g",
-  length.unit = "cm"
+  length.unit = "cm",
+  ageing = 1
 )
 }
 \arguments{
@@ -70,6 +71,8 @@ rundeb(
 \item{mass.unit}{= 'g', mass unit for the plots, 'mg', 'g' or 'kg'}
 
 \item{length.unit}{= 'cm', length unit for the plots, 'mm', 'cm' or 'm'}
+
+\item{ageing}{= 1, impose ageing? 0=immortal, 1=aging according to parameter h.a}
 }
 \description{
 Function to simulate the development, growth and reproduction trajectory of

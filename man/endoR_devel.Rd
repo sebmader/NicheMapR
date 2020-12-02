@@ -5,7 +5,7 @@
 \alias{endoR_devel}
 \title{endoR_devel - the development version of the endotherm model of NicheMapR}
 \usage{
-endoR_devel(AMASS = 1, SHAPE = 4, SHAPE_B_REF = 3, FURTHRMK = 0, ZFURD = 2E-03, ZFURV = 2E-03, TC = 37, TCMAX = 45, TA = 20, TGRD = TA, TSKY = TA, VEL = 0.1, RH = 5, QSOLR = 0, Z = 20, SHADE = 0, NITESHAD = 0,...)
+endoR_devel(AMASS = 65, SHAPE = 4, SHAPE_B = 1.1, FURTHRMK = 0, ZFURD = 2E-03, ZFURV = 2E-03, TC = 37, TC_MAX = 39, TA = 20, TGRD = TA, TSKY = TA, VEL = 0.1, RH = 5, QSOLR = 0, Z = 20, SHADE = 0,...)
 }
 \arguments{
 \item{TA}{= 20, air temperature at local height (°C)}
@@ -24,11 +24,11 @@ endoR_devel(AMASS = 1, SHAPE = 4, SHAPE_B_REF = 3, FURTHRMK = 0, ZFURD = 2E-03, 
 
 \item{SHADE}{= 0, shade level (\%)}
 
-\item{AMASS}{= 1, # kg}
+\item{AMASS}{= 65, # kg}
 
 \item{SHAPE}{= 4, # shape, 1 is cylinder, 2 is sphere, 3 is plate, 4 is ellipsoid}
 
-\item{SHAPE_B_REF}{= 3, # initial ratio between long and short axis (-)}
+\item{SHAPE_B}{= 1.1, # current ratio between long and short axis (-)}
 
 \item{FURTHRMK}{= 0, # user-specified fur thermal conductivity (W/mK), not used if 0}
 
@@ -38,62 +38,63 @@ endoR_devel(AMASS = 1, SHAPE = 4, SHAPE_B_REF = 3, FURTHRMK = 0, ZFURD = 2E-03, 
 
 \item{TC}{= 37, # core temperature (°C)}
 
-\item{TCMAX}{= 45, # maximum core temperature (°C)}
+\item{TC_MAX}{= 39, # maximum core temperature (°C)}
 }
 \description{
 This model uses R code to implement postural and physiological
 thermoregulation under a given environmental scenario for an organism of
 a specified shape and no extra body parts. In this function the sequence of
-thermoregulatory events in the face of heat stress is to first uncurl,
-second change flesh conductivity, third raise core temprature, fourth
+thermoregulatory events in the face of heat stress is to first change posture
+(uncurl), second change flesh conductivity, third raise core temperature, fourth
 pant and fifth sweat. This can be modified to be more specific to the
 species of interest, e.g. by changing the sequence of responses or having
-some happen in parallel. However it is very slow. endoR_solvendo implements
-the endoR sequence of thermoregulation within FORTRAN and is 100x faster.
-Thus it is best to use endoR as a basis for prototyping and refining and
-then to adjust the FORTRAN code of endoR_solvendo (SOLVENDO.f) accordingly.
+some happen in parallel. endoR implements the endoR_devel sequence
+of thermoregulation within FORTRAN and is up to 10x faster. Thus you can
+use endoR_Devel as a basis for prototyping and refining and then adjust
+the FORTRAN code of endoR (SOLVENDO.f) accordingly and compile your own version.
 }
 \details{
 \strong{ Parameters controlling how the model runs:}\cr\cr
-\code{THERMOREG}{ = 1, thermoregulate? (1 = yes, 0 = no)}\cr\cr
 \code{DIFTOL}{ = 0.001, error tolerance for SIMULSOL (°C)}\cr\cr
+\code{THERMOREG}{ = 1, thermoregulate? (1 = yes, 0 = no)}\cr\cr
 
 \strong{ Environment:}\cr\cr
 \code{TAREF}{ = TA, air temperature at reference height (°C)}\cr\cr
 \code{ELEV}{ = 0, elevation (m)}\cr\cr
 \code{ABSSB}{ = 0.8, solar absorptivity of substrate (fractional, 0-1)}\cr\cr
-\code{FLTYPE}{ = 0, FLUID TYPE: 0 = AIR; 1 = FRESH WATER; 2 = SALT WATER - need's to be looked at - only invoked in main program when the dive table is set up}\cr\cr
+\code{FLTYPE}{ = 0, fluid type: 0 = air; 1 = fresh water; 2 = salt water}\cr\cr
 \code{TCONDSB}{ = TGRD, surface temperature for conduction (°C)}\cr\cr
+\code{KSUB}{ = 2.79, substrate thermal conductivity (W/m°C)}\cr
 \code{TBUSH}{ = TA, bush temperature (°C)}\cr\cr
 \code{BP}{ = -1, Pa, negatve means elevation is used}\cr\cr
-\code{O2GAS}{ = 20.95, oxygen concentration of air (\%)}\cr\cr
-\code{N2GAS}{ = 79.02, nitrogen concetration of air (\%)}\cr\cr
-\code{CO2GAS}{ = 0.03, carbon dioxide concentration of air (\%)}\cr\cr
-\code{PCTDIF}{ = 0.15, proportion of solar radiation that is diffuse (fractional, 0-1)}\cr\cr
+\code{O2GAS}{ = 20.95, oxygen concentration of air, to account for non-atmospheric concentrations e.g. in burrows (\%)}\cr\cr
+\code{N2GAS}{ = 79.02, nitrogen concetration of air, to account for non-atmospheric concentrations e.g. in burrows (\%)}\cr\cr
+\code{CO2GAS}{ = 0.0412, carbon dioxide concentration of air, to account for non-atmospheric concentrations e.g. in burrows (\%)}\cr\cr
+\code{R_PCO2}{ = CO2GAS / 100, reference atmospheric dioxide concentration (proportion) of air, to allow for anthropogenic change (\%)}\cr\cr
+\code{PDIF}{ = 0.15, proportion of solar radiation that is diffuse (fractional, 0-1)}\cr\cr
 
 \strong{ Behaviour:}\cr\cr
 \code{SHADE}{ = 0, shade level (\%)}\cr\cr
-\code{NITESHAD}{ = 0, flag for if animal is behaviourally seeking shade for warmth at night - remove?}\cr\cr
 \code{FLYHR}{ = 0, is flight occuring this hour? (imposes forced evaporative loss)}\cr\cr
-\code{UNCURL}{ = 1, allows the animal to uncurl to SHAPE_B_MAX, the value being the increment SHAPE_B is increased per iteration}\cr\cr
-\code{RAISETC}{ = 1, turns on core temperature elevation, the value being the increment by which TC is increased per iteration}\cr\cr
-\code{SWEAT}{ = 0.25, turns on sweating, the value being the increment by which SKINW is increased per iteration (\%)}\cr\cr
-\code{MXWET}{ = 100, maximum surface area that can be wet (\%)}\cr\cr
-\code{AK1inc}{ = 0.5, turns on thermal conductivity increase (W/mK), the value being the increment by which AK1 is increased per iteration (W/mC)}\cr\cr
-\code{AKMAX}{ = 2.8, maximum flesh conductivity (W/mK)}\cr\cr
+\code{UNCURL}{ = 0.1, allows the animal to uncurl to SHAPE_B_MAX, the value being the increment SHAPE_B is increased per iteration}\cr\cr
+\code{TC_INC}{ = 0.1, turns on core temperature elevation, the value being the increment by which TC is increased per iteration}\cr\cr
+\code{PCTWET_INC}{ = 0.1, turns on sweating, the value being the increment by which PCTWET is increased per iteration (\%)}\cr\cr
+\code{PCTWET_MAX}{ = 100, maximum surface area that can be wet (\%)}\cr\cr
+\code{AK1_INC}{ = 0.1, turns on thermal conductivity increase (W/mK), the value being the increment by which AK1 is increased per iteration (W/m°C)}\cr\cr
+\code{AK1_MAX}{ = 2.8, maximum flesh conductivity (W/mK)}\cr\cr
 \code{PANT}{ = 1, multiplier on breathing rate to simulate panting (-)}\cr\cr
-\code{PANTING}{ = 0.1, increment for multiplier on breathing rate to simulate panting (-)}\cr\cr
+\code{PANT_INC}{ = 0.1, increment for multiplier on breathing rate to simulate panting (-)}\cr\cr
+\code{PANT_MULT}{ = 0.05, proportional increase of basal metabolic rate at maximum panting level (-)}\cr\cr
+\code{PANT_MAX}{ = 10, # maximum breathing rate multiplier to simulate panting (-)}\cr\cr
 
 \strong{ General morphology:}\cr\cr
 \code{ANDENS}{ = 1000, body density (kg/m3)}\cr\cr
 \code{SUBQFAT}{ = 0, is subcutaneous fat present? (0 is no, 1 is yes)}\cr\cr
 \code{FATPCT}{ = 20, \% body fat}\cr\cr
-\code{SHAPE_B}{ = SHAPE_B_REF, current ratio between long and short axis (-)}\cr\cr
-\code{SHAPE_B_MAX}{ = SHAPE_B_REF, max possible ratio between long and short axis (-)}\cr\cr
+\code{SHAPE_B_MAX}{ = 5, max possible ratio between long and short axis (-)}\cr\cr
 \code{SHAPE_C}{ = SHAPE_B, current ratio of length:height (plate)}\cr\cr
-\code{MAXPTVEN}{ = 0.5, maxium fraction of surface area that is ventral (fractional, 0-1)}\cr\cr
+\code{PVEN}{ = 0.5, fraction of surface area that is ventral fur (fractional, 0-1)}\cr\cr
 \code{PCOND}{ = 0, fraction of surface area that is touching the substrate (fractional, 0-1)}\cr\cr
-\code{MAXPCOND}{ = 0, maximum fraction of surface area that is touching the substrate (fractional, 0-1)}\cr\cr
 \code{SAMODE}{ = 0, if 0, uses surface area for SHAPE geometry, if 1, uses bird skin surface area allometry from Walsberg & King. 1978. JEB 76:185–189, if 2 uses mammal surface area from Stahl 1967.J. App. Physiol. 22, 453–460.}\cr\cr
 \code{ORIENT}{ = 0, if 1 = normal to rays of sun (heat maximising), if 2 = parallel to rays of sun (heat minimising), or 0 = average}\cr\cr
 
@@ -101,29 +102,26 @@ then to adjust the FORTRAN code of endoR_solvendo (SOLVENDO.f) accordingly.
 \code{DHAIRD}{ = 30E-06, hair diameter, dorsal (m)}\cr\cr
 \code{DHAIRV}{ = 30E-06, hair diameter, ventral (m)}\cr\cr
 \code{LHAIRD}{ = 23.9E-03, hair length, dorsal (m)}\cr\cr
-\code{LHAIRV}{ = 23.9E-03, hair length, dorsal (m)}\cr\cr
+\code{LHAIRV}{ = 23.9E-03, hair length, ventral (m)}\cr\cr
 \code{RHOD}{ = 3000E+04, hair density, dorsal (1/m2)}\cr\cr
 \code{RHOV}{ = 3000E+04, hair density, ventral (1/m2)}\cr\cr
 \code{REFLD}{ = 0.2, fur reflectivity dorsal (fractional, 0-1)}\cr\cr
 \code{REFLV}{ = 0.2, fur reflectivity ventral (fractional, 0-1)}\cr\cr
 \code{ZFURCOMP}{ = ZFURV, depth of compressed fur (for conduction) (m)}\cr\cr
+\code{KHAIR}{ = 0.209, hair thermal conductivity (W/m°C)}\cr\cr
+\code{XR}{ = 1, fractional depth of fur at which longwave radiation is exchanged (0-1)}\cr\cr
 
 \strong{ Radiation exchange:}\cr\cr
 \code{EMISAN}{ = 0.99, animal emissivity (-)}\cr\cr
-\code{FATOBJ}{ = 0, configuration factor to nearby object}\cr\cr
 \code{FABUSH}{ = 0, this is for veg below/around animal (at TALOC)}\cr\cr
 \code{FGDREF}{ = 0.5, reference configuration factor to ground}\cr\cr
 \code{FSKREF}{ = 0.5, configuration factor to sky}\cr\cr
 
-\strong{ Nest properties:}\cr\cr
-\code{NESTYP}{ = 0, # for nest calculations, to do)}\cr\cr
-\code{RoNEST}{ = 0, # for nest calculations, to do}\cr\cr
-
 \strong{ Physiology:}\cr\cr
 \code{AK1}{ = 0.9, # initial thermal conductivity of flesh (0.412 - 2.8 W/mK)}\cr\cr
 \code{AK2}{ = 0.230, # conductivity of fat (W/mK)}\cr\cr
-\code{QBASAL}{ = (70 \* AMASS ^ 0.75) \* (4.185 / (24 \* 3.6)), # basal heat generation (W)}\cr\cr
-\code{SKINW}{ = 0.5, # part of the skin surface that is wet (\%)}\cr\cr
+\code{QBASAL}{ = (70 * AMASS ^ 0.75) * (4.185 / (24 * 3.6)), # basal heat generation (W) based on Kleiber 1947}\cr\cr
+\code{PCTWET}{ = 0.5, # part of the skin surface that is wet (\%)}\cr\cr
 \code{FURWET}{ = 0, # Area of fur/feathers that is wet after rain (\%)}\cr\cr
 \code{PCTBAREVAP}{ = 0, surface area for evaporation that is skin, e.g. licking paws (\%)}\cr\cr
 \code{PCTEYES}{ = 0, # surface area made up by the eye (\%) - make zero if sleeping}\cr\cr
@@ -132,8 +130,7 @@ then to adjust the FORTRAN code of endoR_solvendo (SOLVENDO.f) accordingly.
 \code{TIMACT}{ = 1, # multiplier on metabolic rate for activity costs}\cr\cr
 \code{RQ}{ = 0.80, # respiratory quotient (fractional, 0-1)}\cr\cr
 \code{EXTREF}{ = 20, # O2 extraction efficiency (\%)}\cr\cr
-\code{PANTMAX}{ = 10, # maximum breathing rate multiplier to simulate panting (-)}\cr\cr
-\code{Q10}{ = 1, # Q10 factor for adjusting BMR for TC}\cr\cr
+\code{Q10}{ = 2, # Q10 factor for adjusting BMR for TC}\cr\cr
 
 \strong{ Initial conditions:}\cr\cr
 \code{TS}{ = TC - 3, # initial skin temperature (°C)}\cr\cr
@@ -145,18 +142,18 @@ treg variables (thermoregulatory response):
 \itemize{
 \item 1 TC - core temperature (°C)
 \item 2 TLUNG - lung temperature (°C)
-\item 3 TSKIN_D  - dorsal skin temperature (°C)
+\item 3 TSKIN_D - dorsal skin temperature (°C)
 \item 4 TSKIN_V - ventral skin temperature (°C)
 \item 5 TFA_D - dorsal fur-air interface temperature (°C)
 \item 6 TFA_V - ventral fur-air interface temperature (°C)
 \item 7 SHAPE_B - current ratio between long and short axis due to postural change (-)
 \item 8 PANT - breathing rate multiplier (-)
 \item 9 SKINWET - part of the skin surface that is wet (\%)
-\item 10 K_FLESH - thermal conductivity of flesh (W/mC)
-\item 11 K_FUR - thermal conductivity of flesh (W/mC)
-\item 12 K_FUR_D - thermal conductivity of dorsal fur (W/mC)
-\item 13 K_FUR_V - thermal conductivity of ventral fur (W/mC)
-\item 14 K_COMPFUR - thermal conductivity of compressed fur (W/mC)
+\item 10 K_FLESH - thermal conductivity of flesh (W/m°C)
+\item 11 K_FUR - thermal conductivity of flesh (W/m°C)
+\item 12 K_FUR_D - thermal conductivity of dorsal fur (W/m°C)
+\item 13 K_FUR_V - thermal conductivity of ventral fur (W/m°C)
+\item 14 K_COMPFUR - thermal conductivity of compressed fur (W/m°C)
 \item 15 Q10 - Q10 multiplier on metabolic rate (-)
 }
 morph variables (morphological traits):
@@ -186,7 +183,7 @@ enbal variables (energy balance):
 \itemize{
 \item 1 QSOL - solar radiation absorbed (W)
 \item 2 QIRIN - longwave (infra-red) radiation absorbed (W)
-\item 3 QMET  - characteristic dimension for convection (W)
+\item 3 QGEN  - metabolic heat production (W)
 \item 4 QEVAP - evaporation (W)
 \item 5 QIROUT - longwave (infra-red) radiation lost (W)
 \item 6 QCONV - convection (W)
@@ -197,8 +194,8 @@ enbal variables (energy balance):
 }
 masbal variables (mass exchanges):
 \itemize{
-\item 1 AIR_L - breating rate (L/h)
-\item 2 O2_L - oxgyen consumption rate (L/h)
+\item 1 AIR_L - breathing rate (L/h)
+\item 2 O2_L - oxygen consumption rate (L/h)
 \item 3 H2OResp_g - respiratory water loss (g/h)
 \item 4 H2OCut_g - cutaneous water loss (g/h)
 \item 5 O2_mol_in - oxygen inhaled (mol/h)
@@ -212,19 +209,19 @@ masbal variables (mass exchanges):
 \examples{
 library(NicheMapR)
 # environment
-TAs <- seq(0, 50, 2) # air temperatures (Â°C)
-VEL <- 0.002 # wind speed (m/s)
-RH <- 10 # relative humidity (\\%)
+TAs <- seq(0, 50, 2) # air temperatures (deg C)
+VEL <- 0.01 # wind speed (m/s)
+RH <- 10 # relative humidity (\%)
 QSOLR <- 100 # solar radiation (W/m2)
 
 # core temperature
 TC <- 38 # core temperature (deg C)
-TCMAX <- 43 # maximum core temperature (Â°C)
-RAISETC <- 0.25 # increment by which TC is elevated (Â°C)
+TC_MAX <- 43 # maximum core temperature (deg C)
+TC_INC <- 0.25 # increment by which TC is elevated (deg C)
 
 # size and shape
 AMASS <- 0.0337 # mass (kg)
-SHAPE_B_REF <- 1.1 # start off near to a sphere (-)
+SHAPE_B <- 1.1 # start off near to a sphere (-)
 SHAPE_B_MAX <- 5 # maximum ratio of length to width/depth
 
 # fur/feather properties
@@ -240,18 +237,18 @@ REFLD = 0.248  # fur reflectivity dorsal (fractional, 0-1)
 REFLV = 0.351  # fur reflectivity ventral (fractional, 0-1)
 
 # physiological responses
-SKINW <- 0.1 # base skin wetness (\\%)
-MXWET <- 20 # maximum skin wetness (\\%)
-SWEAT <- 0.25 # intervals by which skin wetness is increased (\\%)
+PCTWET <- 0.1 # base skin wetness (\%)
+PCTWET_MAX <- 20 # maximum skin wetness (\%)
+PCTWET_INC <- 0.25 # intervals by which skin wetness is increased (\%)
 Q10 <- 2 # Q10 effect of body temperature on metabolic rate
 QBASAL <- 10 ^ (-1.461 + 0.669 * log10(AMASS * 1000)) # basal heat generation (W) (bird formula from McKechnie and Wolf 2004 Phys. & Biochem. Zool. 77:502-521)
-DELTAR <- 5 # offset between air temeprature and breath (Â°C)
-EXTREF <- 15 # O2 extraction efficiency (\\%)
-PANTING <- 0.1 # turns on panting, the value being the increment by which the panting multiplier is increased up to the maximum value, PANTMAX
-PANTMAX <- 3# maximum panting rate - multiplier on air flow through the lungs above that determined by metabolic rate
+DELTAR <- 5 # offset between air temperature and breath (deg C)
+EXTREF <- 15 # O2 extraction efficiency (\%)
+PANT_INC <- 0.1 # turns on panting, the value being the increment by which the panting multiplier is increased up to the maximum value, PANT_MAX
+PANT_MAX <- 3 # maximum panting rate - multiplier on air flow through the lungs above that determined by metabolic rate
 
 ptm <- proc.time() # start timing
-endo.out <- lapply(1:length(TAs), function(x){endoR_devel(TA = TAs[x], QSOLR = QSOLR, VEL = VEL, TC = TC, TCMAX = TCMAX, RH = RH, AMASS = AMASS, SHAPE_B_REF = SHAPE_B_REF, SHAPE_B_MAX = SHAPE_B_MAX, SKINW = SKINW, SWEAT = SWEAT, MXWET = MXWET, Q10 = Q10, QBASAL = QBASAL, DELTAR = DELTAR, DHAIRD = DHAIRD, DHAIRV = DHAIRV, LHAIRD = LHAIRD, LHAIRV = LHAIRV, ZFURD = ZFURD, ZFURV = ZFURV, RHOD = RHOD, RHOV = RHOV, REFLD = REFLD, RAISETC = RAISETC, PANTING = PANTING, PANTMAX = PANTMAX, EXTREF = EXTREF)}) # run endoR across environments
+endo.out <- lapply(1:length(TAs), function(x){endoR_devel(TA = TAs[x], QSOLR = QSOLR, VEL = VEL, TC = TC, TC_MAX = TC_MAX, RH = RH, AMASS = AMASS, SHAPE_B = SHAPE_B, SHAPE_B_MAX = SHAPE_B_MAX, PCTWET = PCTWET, PCTWET_INC = PCTWET_INC, PCTWET_MAX = PCTWET_MAX, Q10 = Q10, QBASAL = QBASAL, DELTAR = DELTAR, DHAIRD = DHAIRD, DHAIRV = DHAIRV, LHAIRD = LHAIRD, LHAIRV = LHAIRV, ZFURD = ZFURD, ZFURV = ZFURV, RHOD = RHOD, RHOV = RHOV, REFLD = REFLD, TC_INC = TC_INC, PANT_INC = PANT_INC, PANT_MAX = PANT_MAX, EXTREF = EXTREF)}) # run endoR across environments
 proc.time() - ptm # stop timing
 
 endo.out1 <- do.call("rbind", lapply(endo.out, data.frame)) # turn results into data frame

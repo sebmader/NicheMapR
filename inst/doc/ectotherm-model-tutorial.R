@@ -75,6 +75,7 @@ with(environ, points(ACT * 2 + 7 ~ dates, type = "p", pch = 16, col = "orange"))
 with(environ, points(SHADE / 10 - 6 ~ dates, type = "l", col = "dark green"))
 with(environ, points(DEP - 10 ~ dates, type = "l", col = "brown"))
 abline(ecto$T_F_min, 0, lty = 2, col = 'blue')
+abline(T_pref, 0, lty = 2, col = 'orange')
 abline(ecto$T_F_max, 0, lty = 2, col = 'red')
 ytick<-seq(15, 40, by=5)
 axis(side=2, at=ytick, labels = TRUE)
@@ -183,7 +184,7 @@ for(i in 1:length(par.names)){
 if(exists("E.Hj")==FALSE){E.Hj <- E.Hb}
 if(exists("E.He")==FALSE){E.He <- E.Hb}
 if(exists("L.j")==FALSE){L.j <- L.b}
-F.m <- p.Am / kap.X # redefining F.m to max possible value
+p.Xm <- p.Am / kap.X * 10 # redefining p.Xm to a large value relative ot p.Am
 z.mult <- 1         # DEB body size scaling parameter
 
 # assign missing 5-par thermal response curve parameters if necessary
@@ -276,7 +277,7 @@ ecto<-ectotherm(DEB=1,
                 pct_wet=pct_wet,
                 z=z*z.mult,
                 del_M=del.M,
-                F_m=F.m,
+                p_Xm=p.Xm/24,
                 kap_X=kap.X,
                 v=v/24,
                 kap=kap,
