@@ -18,6 +18,8 @@ Usrhyt = 0.01, ...)
 
 \item{loc}{Longitude and latitude (decimal degrees)}
 
+\item{loc_name}{Name of location to find the corresponding file with future climate data.}
+
 \item{timeinterval}{The number of time intervals to generate predictions for over a year (must be 12 <= x <=365)}
 
 \item{nyears}{The number of years to run}

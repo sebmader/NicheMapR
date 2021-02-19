@@ -12,6 +12,7 @@
 #' "2080_2099", "presentCCKP" (for current climate taken from CCKP), "presentNASA" (for current climate taken from NASA))
 #' @param rcp The emission scenario to be used for climate modelling ("none", "45", "85")
 #' @param loc Longitude and latitude (decimal degrees)
+#' @param loc_name Name of location to find the corresponding file with future climate data.
 #' @param timeinterval The number of time intervals to generate predictions for over a year (must be 12 <= x <=365)
 #' @param nyears The number of years to run
 #' @param REFL Soil solar reflectance, decimal \%
@@ -293,6 +294,7 @@ micro_global <- function(
   time = "present",
   rcp = "none",
   loc = c(-89.40123, 43.07305),
+  loc_name = NULL,
   timeinterval = 12,
   nyears = 1,
   soiltype = 4,
@@ -726,60 +728,60 @@ micro_global <- function(
     if(time != "present") {
 
       # which location
-      loc_name <- ""
-      if(isTRUE(all.equal(loc, c(18.48183333, -33.473)))) {
-        loc_name <- "DAR"
-      } else if(isTRUE(all.equal(loc, c(18.367115, -32.33073)))) {
-        loc_name <- "ELB"
-      } else if(isTRUE(all.equal(loc, c(17.87886, -32.98373)))) {
-        loc_name <- "JAB"
-      } else if(isTRUE(all.equal(loc, c(25.6390895, -28.631946)))) {
-        loc_name <- "LHO"
-      } else if(isTRUE(all.equal(loc, c(17.76673, -29.29445)))) {
-        loc_name <- "STE" #####
-      } else if(isTRUE(all.equal(loc, c(19.103196, -33.616922)))) {
-        loc_name <- "BAI"
-      } else if(isTRUE(all.equal(loc, c(23.639199, -33.955369)))) {
-        loc_name <- "BLO"
-      } else if(isTRUE(all.equal(loc, c(18.83097, -34.38334)))) {
-        loc_name <- "CHA"
-      } else if(isTRUE(all.equal(loc, c(29.52938889, -24.22013889)))) {
-        loc_name <- "CHI"
+      # loc_name <- ""
+      # if(isTRUE(all.equal(loc, c(18.48183333, -33.473)))) {
+      #   loc_name <- "DAR"
       # } else if(isTRUE(all.equal(loc, c(18.367115, -32.33073)))) {
-      #   loc_name <- "DAB"
-      } else if(isTRUE(all.equal(loc, c(18.51303, -31.99062)))) {
-        loc_name <- "GRA"
-      } else if(isTRUE(all.equal(loc, c(18.372249, -33.331626)))) {
-        loc_name <- "KLI"
-      } else if(isTRUE(all.equal(loc, c(17.981998, -31.392708)))) {
-        loc_name <- "LAB"
-      } else if(isTRUE(all.equal(loc, c(29.47108333, -25.53077778)))) {
-        loc_name <- "LAK"
-      } else if(isTRUE(all.equal(loc, c(27.6569725, -23.8605425)))) {
-        loc_name <- "LEP"
-      } else if(isTRUE(all.equal(loc, c(23.63345833, -33.85083333)))) {
-        loc_name <- "LOU"
-      } else if(isTRUE(all.equal(loc, c(30.61777778, -25.14725)))) {
-        loc_name <- "LPA"
-      } else if(isTRUE(all.equal(loc, c(30.619231, -24.498702)))) {
-        loc_name <- "MOK"
+      #   loc_name <- "ELB"
+      # } else if(isTRUE(all.equal(loc, c(17.87886, -32.98373)))) {
+      #   loc_name <- "JAB"
+      # } else if(isTRUE(all.equal(loc, c(25.6390895, -28.631946)))) {
+      #   loc_name <- "LHO"
       # } else if(isTRUE(all.equal(loc, c(17.76673, -29.29445)))) {
-      #   loc_name <- "MOL"
-      } else if(isTRUE(all.equal(loc, c(22.415, -33.916)))) {
-        loc_name <- "MPA"
-      } else if(isTRUE(all.equal(loc, c(24.564, -31.69290278)))) {
-        loc_name <- "NBE"
-      } else if(isTRUE(all.equal(loc, c(24.40478, -34.112457)))) {
-        loc_name <- "PEL"
-      } else if(isTRUE(all.equal(loc, c(28.06308333, -25.68333334)))) {
-        loc_name <- "PRE"
-      } else if(isTRUE(all.equal(loc, c(19.24687, -28.82521)))) {
-        loc_name <- "RIF"
-      } else if(isTRUE(all.equal(loc, c(27.99380556, -24.17363889)))) {
-        loc_name <- "VAAL"
-      } else if(isTRUE(all.equal(loc, c(28.19972222, -27.67694444)))) {
-        loc_name <- "WIN"
-      } else stop("For this location there is no climate data available.")
+      #   loc_name <- "STE" #####
+      # } else if(isTRUE(all.equal(loc, c(19.103196, -33.616922)))) {
+      #   loc_name <- "BAI"
+      # } else if(isTRUE(all.equal(loc, c(23.639199, -33.955369)))) {
+      #   loc_name <- "BLO"
+      # } else if(isTRUE(all.equal(loc, c(18.83097, -34.38334)))) {
+      #   loc_name <- "CHA"
+      # } else if(isTRUE(all.equal(loc, c(29.52938889, -24.22013889)))) {
+      #   loc_name <- "CHI"
+      # # } else if(isTRUE(all.equal(loc, c(18.367115, -32.33073)))) {
+      # #   loc_name <- "DAB"
+      # } else if(isTRUE(all.equal(loc, c(18.51303, -31.99062)))) {
+      #   loc_name <- "GRA"
+      # } else if(isTRUE(all.equal(loc, c(18.372249, -33.331626)))) {
+      #   loc_name <- "KLI"
+      # } else if(isTRUE(all.equal(loc, c(17.981998, -31.392708)))) {
+      #   loc_name <- "LAB"
+      # } else if(isTRUE(all.equal(loc, c(29.47108333, -25.53077778)))) {
+      #   loc_name <- "LAK"
+      # } else if(isTRUE(all.equal(loc, c(27.6569725, -23.8605425)))) {
+      #   loc_name <- "LEP"
+      # } else if(isTRUE(all.equal(loc, c(23.63345833, -33.85083333)))) {
+      #   loc_name <- "LOU"
+      # } else if(isTRUE(all.equal(loc, c(30.61777778, -25.14725)))) {
+      #   loc_name <- "LPA"
+      # } else if(isTRUE(all.equal(loc, c(30.619231, -24.498702)))) {
+      #   loc_name <- "MOK"
+      # # } else if(isTRUE(all.equal(loc, c(17.76673, -29.29445)))) {
+      # #   loc_name <- "MOL"
+      # } else if(isTRUE(all.equal(loc, c(22.415, -33.916)))) {
+      #   loc_name <- "MPA"
+      # } else if(isTRUE(all.equal(loc, c(24.564, -31.69290278)))) {
+      #   loc_name <- "NBE"
+      # } else if(isTRUE(all.equal(loc, c(24.40478, -34.112457)))) {
+      #   loc_name <- "PEL"
+      # } else if(isTRUE(all.equal(loc, c(28.06308333, -25.68333334)))) {
+      #   loc_name <- "PRE"
+      # } else if(isTRUE(all.equal(loc, c(19.24687, -28.82521)))) {
+      #   loc_name <- "RIF"
+      # } else if(isTRUE(all.equal(loc, c(27.99380556, -24.17363889)))) {
+      #   loc_name <- "VAAL"
+      # } else if(isTRUE(all.equal(loc, c(28.19972222, -27.67694444)))) {
+      #   loc_name <- "WIN"
+      # } else stop("For this location there is no climate data available.")
 
       cat(paste0("location is ", loc_name, ".\n"))
 
